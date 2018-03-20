@@ -1,0 +1,9 @@
+
+[Hypothesis]
+api_url = https://sense.tw/api
+api_key =
+
+[Trello]
+api_url = https://api.trello.com/1
+api_key =
+token =
