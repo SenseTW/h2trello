@@ -45,9 +45,6 @@ class Hypothesis:
         self.title = title
         self.url = url
 
-    def annotations(self):
-        return [1]
-
     @property
     def group_id(self):
         group_re = re.compile("//sense.tw/groups/(.*?)/")
