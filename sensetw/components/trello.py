@@ -2,6 +2,8 @@
 import re
 import requests
 
+trello_name_quote_limit = 128
+
 
 class Trello:
 
@@ -34,9 +36,12 @@ class Trello:
         return {la["name"]: la["id"] for la in labels}
 
     def card_to_trello_card(self, card, labels=None, list_id=None):
+        quote = card.quote[:trello_name_quote_limit] + "⋯⋯" \
+            if len(card.quote) > trello_name_quote_limit \
+            else card.quote
         trello_name = "【{title}】{quote} {tags}".format(
             title=card.title,
-            quote=card.quote,
+            quote=quote,
             tags=" ".join(["#" + tag for tag in card.tags])
         )
         trello_desc = "\n".join(
