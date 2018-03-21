@@ -5,7 +5,9 @@ from sensetw.components import Hypothesis, Trello
 import logging
 import configparser
 import os
+import pickle
 
+sync_path = os.path.join(os.path.dirname(__file__), "../db/sync.db")
 conf_path = os.path.join(os.path.dirname(__file__), "../h2trello.conf")
 
 logger = logging.Logger("h2trello")
@@ -17,25 +19,58 @@ conf.read(conf_path)
 
 mappings = [
     {
-        "source_title": "AI 人才培育",
-        "source_url": "https://sense.tw/groups/RNYBizqX/ai-ren-cai-pei-yu",
-        "target_title": "AI 人材培育問題點分析",
-        "target_url": "https://trello.com/b/Lo01hfDB/ai-%E4%BA%BA%E6%9D%90%E5%9F%B9%E8%82%B2%E5%95%8F%E9%A1%8C%E9%BB%9E%E5%88%86%E6%9E%90",
+        "hypothesis_title": "AI 人才培育",
+        "hypothesis_url": "https://sense.tw/groups/RNYBizqX/ai-ren-cai-pei-yu",
+        "trello_title": "AI 人材培育問題點分析",
+        "trello_url": "https://trello.com/b/Lo01hfDB/ai-%E4%BA%BA%E6%9D%90%E5%9F%B9%E8%82%B2%E5%95%8F%E9%A1%8C%E9%BB%9E%E5%88%86%E6%9E%90",
     }
 ]
 
+
+try:
+    with open(sync_path, "rb") as fh:
+        sync_log = pickle.load(fh)
+except FileNotFoundError:
+    sync_log = []
+
+
+def find_log_by_trello_id(tid):
+    for i, card in enumerate(sync_log):
+        if card.trello_id == tid:
+            return i
+    return -1
+
+
+def find_log_by_hypothesis_id(hid):
+    for i, card in enumerate(sync_log):
+        if card.hypothesis_id == hid:
+            return i
+    return -1
+
+
 for mapping in mappings:
     h = Hypothesis(api_url=conf["Hypothesis"]["api_url"], api_key=conf["Hypothesis"]["api_key"],
-                   title=mapping["source_title"], url=mapping["source_url"])
+                   title=mapping["hypothesis_title"], url=mapping["hypothesis_url"])
     t = Trello(api_url=conf["Trello"]["api_url"],
                api_key=conf["Trello"]["api_key"], token=conf["Trello"]["token"],
-               title=mapping["target_title"], url=mapping["target_url"])
+               title=mapping["trello_title"], url=mapping["trello_url"])
     inboxes = t.get_lists()
     labels = t.get_labels()
 
+    count = 0
     for card in h.annotations():
+        r = find_log_by_hypothesis_id(card.hypothesis_id)
+        if r >= 0:
+            continue
         tid = t.post(card,
                      labels=[labels[card.source_type]
                              ] if card.source_type in labels else [],
                      list_id=inboxes[card.source_type])
         card.trello_id = tid
+        sync_log.append(card)
+        count = count + 1
+        if count > 5:
+            break
+
+with open(sync_path, "wb") as fh:
+    pickle.dump(sync_log, fh)

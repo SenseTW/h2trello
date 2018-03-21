@@ -36,9 +36,9 @@ class Trello:
         return {la["name"]: la["id"] for la in labels}
 
     def card_to_trello_card(self, card, labels=None, list_id=None):
-        quote = card.quote[:trello_name_quote_limit] + "⋯⋯" \
-            if len(card.quote) > trello_name_quote_limit \
-            else card.quote
+        quote = card.quote if card.quote is not None else ""
+        if len(quote) > trello_name_quote_limit:
+            quote = quote[:trello_name_quote_limit] + "⋯⋯"
         trello_name = "【{title}】{quote} {tags}".format(
             title=card.title,
             quote=quote,
