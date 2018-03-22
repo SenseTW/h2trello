@@ -62,11 +62,23 @@ class Hypothesis:
             "Authorization": "Bearer {api_key}".format(api_key=self.api_key)
         }
 
-    def group_search_url(self):
-        return self.api_url + "/search?group={group_id}".format(group_id=self.group_id)
+    def group_search_url(self, offset=0, limit=200):
+        return self.api_url + "/search?group={group_id}&limit={limit}&offset={offset}".format(
+            group_id=self.group_id, limit=limit, offset=offset)
 
     def _json_to_annotations(self, rows):
         return [Annotation.from_json(data) for data in rows]
+
+    def _search_all_annotations(self, accum, agent, headers, offset=0, limit=200):
+        response = agent.get(
+            self.group_search_url(offset=offset, limit=limit),
+            headers=headers)
+        data = response.json()
+        accum.extend(data["rows"])
+        if len(accum) >= data["total"]:
+            return accum
+        else:
+            return self._search_all_annotations(accum, agent, headers, offset + limit, limit)
 
     def annotations(self, agent=None):
         """
@@ -76,9 +88,8 @@ class Hypothesis:
             agent = requests
         headers = {}
         headers.update(self.authorization_headers)
-        response = agent.get(self.group_search_url(), headers=headers)
-        data = response.json()
-        return [annotation_to_card(ann) for ann in self._json_to_annotations(data["rows"])]
+        rows = self._search_all_annotations([], agent, headers)
+        return [annotation_to_card(ann) for ann in self._json_to_annotations(rows)]
 
 
 class Annotation(object):
