@@ -34,6 +34,7 @@ def test_hypothesis_annotation_to_card(h):
     assert c.source_type == "外部意見"
     assert c.hypothesis_id == "ljSw7iv9Eeilw3M5xviqxw"
     assert c.tags == []
+    assert c.comments == []
 
 
 def test_annotation_from_json():
@@ -44,6 +45,7 @@ def test_annotation_from_json():
     assert a.link == "https://O.sense.tw/ljSw7iv9Eeilw3M5xviqxw"
     assert a.id == "ljSw7iv9Eeilw3M5xviqxw"
     assert a.tags == []
+    assert a.text == ""
 
 
 if __name__ == "__main__":

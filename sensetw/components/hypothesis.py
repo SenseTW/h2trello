@@ -26,10 +26,15 @@ def annotation_to_card(ann):
     source_type = extract_source_type(ann.uri)
     tags = ann.tags
     hypothesis_id = ann.id
+    comments = [ann.text] \
+        if ann.text is not None and len(ann.text) > 0 \
+        else []
 
     card = Card(
         title=title, quote=quote, source_url=source_url, source_type=source_type,
-        tags=tags, hypothesis_id=hypothesis_id)
+        comments=comments, tags=tags,
+        hypothesis_id=hypothesis_id
+    )
 
     return card
 
@@ -78,7 +83,8 @@ class Hypothesis:
 
 class Annotation(object):
 
-    _fields = ["title", "quote", "uri", "link", "tags", "id"]
+    _fields = ["title", "quote", "uri", "link", "tags", "id",
+               "text"]
 
     def __init__(self, **kwargs):
         for field, value in kwargs.items():
@@ -116,4 +122,5 @@ class Annotation(object):
             uri=data["uri"],
             link=data["links"]["incontext"] if "incontext" in data["links"] else "",
             tags=data["tags"],
-            id=data["id"])
+            id=data["id"],
+            text=data["text"])

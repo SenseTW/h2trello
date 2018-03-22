@@ -44,7 +44,7 @@ for mapping in mappings:
     r = h2trello.send(h, t,
                       lambda card: h2trello.find_log_by_hypothesis_id(
                           h2trello_log, card.hypothesis_id) == -1,
-                      limit=1)
+                      )
     h2trello_log.extend(r)
 
 h2trello.save_log(h2trello_log)

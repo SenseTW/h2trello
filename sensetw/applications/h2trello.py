@@ -19,7 +19,6 @@ def send(h, t, check_fn, limit=None):
                      labels=[labels[card.source_type]
                              ] if card.source_type in labels else [],
                      list_id=inboxes[card.source_type])
-        card.trello_id = tid
         sent_cards.append(card)
 
         if limit is not None and len(sent_cards) >= limit:

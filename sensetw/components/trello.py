@@ -58,6 +58,13 @@ class Trello:
             trello_card["idList"] = list_id
         return trello_card
 
+    def comment_params(self, card):
+        params = {}
+        params.update(self.request_params)
+        params.update({"id": card.trello_id})
+        tasks = [{**params, **{"text": text}} for text in card.comments]
+        return tasks
+
     def post(self, card, labels=None, list_id=None, agent=None):
         if agent is None:
             agent = requests
@@ -66,7 +73,13 @@ class Trello:
         params.update(self.card_to_trello_card(
             card, labels=labels, list_id=list_id))
         response = agent.post(self.api_url + "/cards", params=params)
-        return response.text
+        result = response.json()
+        card.trello_id = result["id"]
+        comment_params = self.comment_params(card)
+        for task in comment_params:
+            url = self.api_url + "/cards/" + card.trello_id + "/actions/comments"
+            response = agent.post(url, params=task)
+        return card.trello_id
 
     @property
     def board_id(self):

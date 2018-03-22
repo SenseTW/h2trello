@@ -16,6 +16,5 @@ $ make start
 # TODO
 
 * Error handling and logging.
-* Add comments.
 * Command line options.
 * Packaging and deploy.
