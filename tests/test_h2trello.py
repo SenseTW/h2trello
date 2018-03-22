@@ -30,17 +30,17 @@ def test_h2trello_log():
 def test_h2trello_log_find(h2trello_log):
     card = Card(
         title="", quote="",
-        hypothesis_id=0, trello_id=1
+        hypothesis_id="0", trello_id="1"
     )
     h2trello_log.append(card)
 
-    r = h2trello.find_log_by_hypothesis_id(h2trello_log, 0)
+    r = h2trello.find_log_by_hypothesis_id(h2trello_log, "0")
     assert r == 0
 
-    r = h2trello.find_log_by_hypothesis_id(h2trello_log, 1)
+    r = h2trello.find_log_by_hypothesis_id(h2trello_log, "1")
     assert r == -1
 
-    r = h2trello.find_log_by_trello_id(h2trello_log, 1)
+    r = h2trello.find_log_by_trello_id(h2trello_log, "1")
     assert r == 0
 
 
