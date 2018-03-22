@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 
-from sensetw import Card
 from sensetw.components import Hypothesis, Trello
+from sensetw.applications import h2trello
 import logging
 import configparser
 import os
-import pickle
-
-sync_path = os.path.join(os.path.dirname(__file__), "../db/sync.db")
-conf_path = os.path.join(os.path.dirname(__file__), "../h2trello.conf")
 
 logger = logging.Logger("h2trello")
 logger.setLevel(logging.WARNING)
 logger.addHandler(logging.StreamHandler())
 
+conf_path = os.path.join(os.path.dirname(__file__), "../h2trello.conf")
 conf = configparser.ConfigParser()
 conf.read(conf_path)
 
@@ -27,50 +24,27 @@ mappings = [
 ]
 
 
-try:
-    with open(sync_path, "rb") as fh:
-        sync_log = pickle.load(fh)
-except FileNotFoundError:
-    sync_log = []
+def mapping_to_components(conf, mapping):
+    h = Hypothesis(api_url=conf["Hypothesis"]["api_url"],
+                   api_key=conf["Hypothesis"]["api_key"],
+                   title=mapping["hypothesis_title"],
+                   url=mapping["hypothesis_url"])
+    t = Trello(api_url=conf["Trello"]["api_url"],
+               api_key=conf["Trello"]["api_key"],
+               token=conf["Trello"]["token"],
+               title=mapping["trello_title"],
+               url=mapping["trello_url"])
+    return h, t
 
 
-def find_log_by_trello_id(tid):
-    for i, card in enumerate(sync_log):
-        if card.trello_id == tid:
-            return i
-    return -1
-
-
-def find_log_by_hypothesis_id(hid):
-    for i, card in enumerate(sync_log):
-        if card.hypothesis_id == hid:
-            return i
-    return -1
-
+h2trello_log = h2trello.load_log()
 
 for mapping in mappings:
-    h = Hypothesis(api_url=conf["Hypothesis"]["api_url"], api_key=conf["Hypothesis"]["api_key"],
-                   title=mapping["hypothesis_title"], url=mapping["hypothesis_url"])
-    t = Trello(api_url=conf["Trello"]["api_url"],
-               api_key=conf["Trello"]["api_key"], token=conf["Trello"]["token"],
-               title=mapping["trello_title"], url=mapping["trello_url"])
-    inboxes = t.get_lists()
-    labels = t.get_labels()
+    h, t = mapping_to_components(conf, mapping)
+    r = h2trello.send(h, t,
+                      lambda card: h2trello.find_log_by_hypothesis_id(
+                          h2trello_log, card.hypothesis_id) == -1,
+                      limit=1)
+    h2trello_log.extend(r)
 
-    count = 0
-    for card in h.annotations():
-        r = find_log_by_hypothesis_id(card.hypothesis_id)
-        if r >= 0:
-            continue
-        tid = t.post(card,
-                     labels=[labels[card.source_type]
-                             ] if card.source_type in labels else [],
-                     list_id=inboxes[card.source_type])
-        card.trello_id = tid
-        sync_log.append(card)
-        count = count + 1
-        if count > 5:
-            break
-
-with open(sync_path, "wb") as fh:
-    pickle.dump(sync_log, fh)
+h2trello.save_log(h2trello_log)
