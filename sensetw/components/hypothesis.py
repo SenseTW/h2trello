@@ -127,8 +127,10 @@ class Annotation(object):
 
     @classmethod
     def from_json(cls, data):
+        title = data["document"]["title"][0] if "title" in data["document"] else ""
+        title = re.sub("[【】]", "", title)
         return Annotation(
-            title=data["document"]["title"][0] if "title" in data["document"] else "",
+            title=title,
             quote=cls.extract_quote(data["target"]),
             uri=data["uri"],
             link=data["links"]["incontext"] if "incontext" in data["links"] else "",

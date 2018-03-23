@@ -3,6 +3,8 @@ import os
 import pickle
 
 db_path = os.path.join(os.path.dirname(__file__), "../../db/h2trello.db")
+
+
 def send(h, t, check_fn, limit=None):
     """
     Send Hypothesis annotations to Trello as cards.
@@ -27,12 +29,12 @@ def send(h, t, check_fn, limit=None):
     return sent_cards
 
 
-
 def save_log(log, filepath=None):
     if filepath is None:
         filepath = db_path
     with open(filepath, "wb") as fh:
         pickle.dump(log, fh)
+
 
 def load_log(filepath=None):
     if filepath is None:
@@ -42,6 +44,7 @@ def load_log(filepath=None):
             return pickle.load(fh)
     except FileNotFoundError:
         return []
+
 
 def find_log_by_trello_id(log, tid):
     for i, card in enumerate(log):
@@ -55,4 +58,3 @@ def find_log_by_hypothesis_id(log, hid):
         if card.hypothesis_id == hid:
             return i
     return -1
-
