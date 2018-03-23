@@ -128,7 +128,7 @@ class Annotation(object):
     @classmethod
     def from_json(cls, data):
         title = data["document"]["title"][0] if "title" in data["document"] else ""
-        title = re.sub("[【】]", "", title)
+        title = re.sub("[【】\[\]\{\}\|]", " ", title)
         return Annotation(
             title=title,
             quote=cls.extract_quote(data["target"]),
