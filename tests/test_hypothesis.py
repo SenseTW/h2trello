@@ -23,7 +23,8 @@ def test_hypothesis_group_id(h):
 
 
 def test_hypothesis_search_group_url(h):
-    assert h.group_search_url() == "https://sense.tw/api/search?group=8VnXgMY2"
+    assert h.group_search_url().find(
+            "https://sense.tw/api/search?group=8VnXgMY2") == 0
 
 
 def test_hypothesis_annotation_to_card(h):
