@@ -26,7 +26,7 @@ def annotation_to_card(ann):
     source_type = extract_source_type(ann.uri)
     tags = ann.tags
     hypothesis_id = ann.id
-    comments = [ann.text] \
+    comments = ["{user}: {text}".format(user=ann.user, text=ann.text)] \
         if ann.text is not None and len(ann.text) > 0 \
         else []
 
@@ -95,7 +95,7 @@ class Hypothesis:
 class Annotation(object):
 
     _fields = ["title", "quote", "uri", "link", "tags", "id",
-               "text"]
+               "text", "user"]
 
     def __init__(self, **kwargs):
         for field, value in kwargs.items():
@@ -129,6 +129,9 @@ class Annotation(object):
     def from_json(cls, data):
         title = data["document"]["title"][0] if "title" in data["document"] else ""
         title = re.sub("[【】\[\]\{\}\|]", " ", title)
+        user = data["user"]
+        user = re.sub("acct:", "", user)
+        user = re.sub("@.*", "", user)
         return Annotation(
             title=title,
             quote=cls.extract_quote(data["target"]),
@@ -136,4 +139,5 @@ class Annotation(object):
             link=data["links"]["incontext"] if "incontext" in data["links"] else "",
             tags=data["tags"],
             id=data["id"],
-            text=data["text"])
+            text=data["text"],
+            user=user)
