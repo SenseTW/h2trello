@@ -1,6 +1,6 @@
 
 import pytest
-from sensetw import Card
+from sensetw import Card, Mapping
 
 
 def test_basics():
@@ -15,6 +15,14 @@ def test_basics():
 
     assert c.source_url == "https://O.sense.tw/zzE6YCdEEeil_FeHqIHjFg"
     assert c.source_type == "外部意見"
+
+
+def test_mapping():
+    m = Mapping(hypothesis_url="https://sense.tw/groups/12345/",
+                trello_url="https://trello.com/b/Lo01hfDB/")
+    assert m.hypothesis_group_id == "12345"
+    assert m.trello_board_id == "Lo01hfDB"
+    assert m.id == "12345:Lo01hfDB"
 
 
 if __name__ == "__main__":

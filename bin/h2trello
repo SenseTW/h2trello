@@ -17,21 +17,21 @@ conf.read(conf_path)
 
 mappings = get_mappings(conf["Google Spreadsheet"]["csv_url"])
 
+h2trello_log = h2trello.load_log()
+
 
 def mapping_to_components(conf, mapping):
     h = Hypothesis(api_url=conf["Hypothesis"]["api_url"],
                    api_key=conf["Hypothesis"]["api_key"],
-                   title=mapping["hypothesis_title"],
-                   url=mapping["hypothesis_url"])
+                   title=mapping.hypothesis_title,
+                   url=mapping.hypothesis_url)
     t = Trello(api_url=conf["Trello"]["api_url"],
                api_key=conf["Trello"]["api_key"],
                token=conf["Trello"]["token"],
-               title=mapping["trello_title"],
-               url=mapping["trello_url"])
+               title=mapping.trello_title,
+               url=mapping.trello_url)
     return h, t
 
-
-h2trello_log = h2trello.load_log()
 
 for mapping in mappings:
     h, t = mapping_to_components(conf, mapping)

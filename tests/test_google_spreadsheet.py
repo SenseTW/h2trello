@@ -8,8 +8,7 @@ def test_get_mappings():
     mappings = get_mappings(csv_url)
     l = len(mappings)
     assert l > 0
-    assert "hypothesis_title" in mappings[0]
-    assert "hypothesis_url" in mappings[0]
-    assert "trello_title" in mappings[0]
-    assert "trello_url" in mappings[0]
-
+    assert len(mappings[0].hypothesis_title) > 0
+    assert len(mappings[0].hypothesis_url) > 0
+    assert len(mappings[0].trello_title) > 0
+    assert len(mappings[0].trello_url) > 0
