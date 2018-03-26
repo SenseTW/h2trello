@@ -43,7 +43,7 @@ def load_log(filepath=None):
         with open(filepath, "rb") as fh:
             return pickle.load(fh)
     except FileNotFoundError:
-        return []
+        return {}
 
 
 def find_log_by_trello_id(log, tid):

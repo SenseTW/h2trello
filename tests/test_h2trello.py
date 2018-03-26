@@ -18,11 +18,12 @@ def h2trello_log():
 
 def test_h2trello_log():
     log = h2trello.load_log(filepath=test_log_path)
-    log.append(123)
+    log["test"] = []
+    log["test"].append(123)
     h2trello.save_log(log, filepath=test_log_path)
 
     log = h2trello.load_log(test_log_path)
-    assert log == [123]
+    assert log["test"] == [123]
 
     os.remove(test_log_path)
 
@@ -32,15 +33,16 @@ def test_h2trello_log_find(h2trello_log):
         title="", quote="",
         hypothesis_id="0", trello_id="1"
     )
-    h2trello_log.append(card)
+    h2trello_log["test"] = []
+    h2trello_log["test"].append(card)
 
-    r = h2trello.find_log_by_hypothesis_id(h2trello_log, "0")
+    r = h2trello.find_log_by_hypothesis_id(h2trello_log["test"], "0")
     assert r == 0
 
-    r = h2trello.find_log_by_hypothesis_id(h2trello_log, "1")
+    r = h2trello.find_log_by_hypothesis_id(h2trello_log["test"], "1")
     assert r == -1
 
-    r = h2trello.find_log_by_trello_id(h2trello_log, "1")
+    r = h2trello.find_log_by_trello_id(h2trello_log["test"], "1")
     assert r == 0
 
 

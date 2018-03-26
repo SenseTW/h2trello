@@ -35,10 +35,12 @@ def mapping_to_components(conf, mapping):
 
 for mapping in mappings:
     h, t = mapping_to_components(conf, mapping)
+    if mapping.id not in h2trello_log:
+        h2trello_log[mapping.id] = []
     r = h2trello.send(h, t,
                       lambda card: h2trello.find_log_by_hypothesis_id(
-                          h2trello_log, card.hypothesis_id) == -1,
+                          h2trello_log[mapping.id], card.hypothesis_id) == -1,
                       )
-    h2trello_log.extend(r)
+    h2trello_log[mapping.id].extend(r)
 
 h2trello.save_log(h2trello_log)
