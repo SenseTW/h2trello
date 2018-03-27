@@ -24,3 +24,6 @@ test:
 
 start:
 	PYTHONPATH=. pipenv run bin/h2trello
+
+repeat:
+	PYTHONPATH=. pipenv run bin/h2trello -r 120

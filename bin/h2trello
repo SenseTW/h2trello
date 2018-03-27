@@ -17,8 +17,6 @@ conf.read(conf_path)
 
 mappings = get_mappings(conf["Google Spreadsheet"]["csv_url"])
 
-h2trello_log = h2trello.load_log()
-
 
 def mapping_to_components(conf, mapping):
     h = Hypothesis(api_url=conf["Hypothesis"]["api_url"],
@@ -33,14 +31,32 @@ def mapping_to_components(conf, mapping):
     return h, t
 
 
-for mapping in mappings:
-    h, t = mapping_to_components(conf, mapping)
-    if mapping.id not in h2trello_log:
-        h2trello_log[mapping.id] = []
-    r = h2trello.send(h, t,
-                      lambda card: h2trello.find_log_by_hypothesis_id(
-                          h2trello_log[mapping.id], card.hypothesis_id) == -1,
-                      )
-    h2trello_log[mapping.id].extend(r)
+def main():
+    h2trello_log = h2trello.load_log()
 
-h2trello.save_log(h2trello_log)
+    for mapping in mappings:
+        h, t = mapping_to_components(conf, mapping)
+        if mapping.id not in h2trello_log:
+            h2trello_log[mapping.id] = []
+        r = h2trello.send(h, t,
+                          lambda card: h2trello.find_log_by_hypothesis_id(
+                              h2trello_log[mapping.id], card.hypothesis_id) == -1,
+                          )
+        h2trello_log[mapping.id].extend(r)
+
+    h2trello.save_log(h2trello_log)
+
+
+if __name__ == "__main__":
+    import argparse
+    import time
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-r", dest="repeat")
+    args = parser.parse_args()
+
+    if args.repeat:
+        while True:
+            main()
+            time.sleep(int(args.repeat))
+    else:
+        main()
