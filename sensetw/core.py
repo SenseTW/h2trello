@@ -8,6 +8,13 @@ class Card(object):
         "hypothesis_id", "trello_id",
     ]
 
+    source_types = ["外部意見", "政府與研究報告", "其它"]
+    source_type_colors = {
+        "外部意見": "orange",
+        "政府與研究報告": "green",
+        "其它": "yellow",
+    }
+
     def __init__(self, **kwargs):
         for field, value in kwargs.items():
             if field not in self._fields:
@@ -26,7 +33,7 @@ class Card(object):
 
     def _check_field(self, field, value):
         if field == "source_type":
-            return value in ["外部意見", "政府與研究報告", "其它"]
+            return value in self.source_types
         if field == "tags":
             return isinstance(value, list)
         if field == "comments":

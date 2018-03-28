@@ -9,6 +9,8 @@ def send(h, t, check_fn, limit=None):
     """
     Send Hypothesis annotations to Trello as cards.
     """
+    t.create_lists()
+    t.create_labels()
     inboxes = t.get_lists()
     labels = t.get_labels()
 
