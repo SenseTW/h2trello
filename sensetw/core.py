@@ -59,13 +59,13 @@ class Mapping(object):
 
     @property
     def hypothesis_group_id(self):
-        group_re = re.compile("//sense.tw/groups/(.*?)/")
+        group_re = re.compile("//sense.tw/groups/([^/]*)")
         r = group_re.search(self.hypothesis_url)
         return r.group(1)
 
     @property
     def trello_board_id(self):
-        board_re = re.compile("//trello.com/b/(.*?)/")
+        board_re = re.compile("//trello.com/b/([^/]*)")
         r = board_re.search(self.trello_url)
         return r.group(1)
 
