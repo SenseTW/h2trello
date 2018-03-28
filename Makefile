@@ -1,6 +1,8 @@
 
 PYTHON_VERSION=3
 
+REPEAT ?= 90
+
 .PHONY: all init-project install update freeze test start
 
 all: init-project install
@@ -26,4 +28,4 @@ start:
 	PYTHONPATH=. pipenv run bin/h2trello
 
 repeat:
-	PYTHONPATH=. pipenv run bin/h2trello -r 120
+	PYTHONPATH=. pipenv run bin/h2trello -r ${REPEAT}
